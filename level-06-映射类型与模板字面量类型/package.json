@@ -1,0 +1,14 @@
+{
+  "name": "level-06-mapped-template-literal",
+  "version": "1.0.0",
+  "description": "Level 06: 映射类型与模板字面量类型",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "tsc && node dist/main.js",
+    "dev": "ts-node src/main.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

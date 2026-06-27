@@ -1,0 +1,13 @@
+{
+  "name": "level-08-classes-decorators",
+  "version": "1.0.0",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "tsc && node dist/main.js",
+    "dev": "ts-node src/main.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "confix",
+  "version": "1.0.0",
+  "description": "类型安全的 CLI 配置解析器 —— learn-lang-ts 毕业设计",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "tsc && node dist/src/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "tsx --test tests/parser.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.3.0"
+  }
+}

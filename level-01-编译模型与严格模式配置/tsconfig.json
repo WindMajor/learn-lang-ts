@@ -1,0 +1,61 @@
+{
+  "compilerOptions": {
+    // ============ 严格模式（全部打开！）============
+    "strict": true,
+    // 以下被 "strict": true 自动启用：
+    // - strictNullChecks:      null/undefined 不是其他类型的子类型
+    // - strictFunctionTypes:   函数参数逆变检查
+    // - strictBindCallApply:   bind/call/apply 参数检查
+    // - strictPropertyInitialization: 类属性必须初始化
+    // - noImplicitAny:         禁止隐式 any
+    // - noImplicitReturns:     [⚠️ strict 不启用此项] 所有分支必须有返回值
+    // - noFallthroughCasesInSwitch: [⚠️ strict 不启用] case 必须 break/return
+
+    // 额外手动启用（strict 没有涵盖的）
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+
+    // ============ 编译目标 ============
+    // WHAT: 编译到 ES2022。Node.js 18+ 完全支持。
+    "target": "ES2022",
+    // WHAT: 使用 Node.js 的 CommonJS 模块系统（便于 node 直接运行）
+    "module": "Node16",
+    // WHAT: Node16 模块解析策略要求使用文件扩展名或 package.json type 字段
+    "moduleResolution": "Node16",
+    // WHAT: 输出的 JS 文件放在 dist 目录
+    "outDir": "./dist",
+    // WHAT: 源码目录
+    "rootDir": "./src",
+    // WHAT: 生成 .d.ts 类型声明文件（查看类型擦除后的效果）
+    "declaration": true,
+    // WHAT: 生成 source map（调试时可以看到 .ts 源码）
+    "sourceMap": true,
+
+    // ============ 类型库 ============
+    // WHAT: 只引用 ES2022 + DOM 类型定义（Node.js 项目不需要 DOM）
+    "lib": ["ES2022"],
+
+    // ============ 模块互操作 ============
+    // WHAT: 允许 `import React from 'react'` 这种写法（即使模块没有默认导出）
+    "esModuleInterop": true,
+    // WHAT: 允许从没有默认导出的模块中使用默认导入（静态分析用）
+    "allowSyntheticDefaultImports": true,
+    // WHAT: 强制在导入路径中使用文件扩展名
+    "forceConsistentCasingInFileNames": true,
+    // WHAT: 跳过对 .d.ts 的类型检查（加快编译，适用于有大量第三方类型的情况）
+    "skipLibCheck": true,
+
+    // ============ 额外安全 ============
+    // WHAT: 在所有 switch 语句中进行类型收窄后，未处理的情况为 never
+    //       配合第 4 关的穷尽检查使用
+    // 注：TS 5.2+ 已默认启用此行为，但显式标出来
+    "exactOptionalPropertyTypes": false
+  },
+  // 包含 src 目录下的所有 .ts 文件
+  "include": ["src/**/*.ts"],
+  // 排除编译输出目录
+  "exclude": ["node_modules", "dist"]
+}
