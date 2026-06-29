@@ -123,7 +123,8 @@ type MyOmit<T, K extends keyof T> = {
 };
 
 // 6️⃣ Record<K, V>：构造一个键为 K、值为 V 的对象类型
-type MyRecord<K extends keyof never, V> = {
+//   keyof any = string | number | symbol（所有可索引类型的并集）
+type MyRecord<K extends keyof any, V> = {
   [P in K]: V;
 };
 
@@ -358,7 +359,7 @@ function templateLiteralTypes() {
 type MyP<T> = { [K in keyof T]?: T[K] };
 type MyR<T> = { readonly [K in keyof T]: T[K] };
 type MyO<T, K extends keyof T> = { [P in Exclude<keyof T, K>]: T[P] };
-type MyRec<K extends keyof never, V> = { [P in K]: V };
+type MyRec<K extends keyof any, V> = { [P in K]: V };
 
 interface TestObj {
   id: number;

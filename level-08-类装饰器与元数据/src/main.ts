@@ -138,10 +138,12 @@ function classDualNature() {
 
   // typeof Dog —— 构造函数的类型（不是实例类型）
   type DogConstructor = typeof Dog;  // new (name: string, breed: string) => Dog
+  void (null as unknown as DogConstructor);
   console.log(`species: ${Dog.species}`);
 
   // InstanceType<typeof Dog> —— 从构造函数类型提取实例类型 = Dog
   type DogInstance = InstanceType<typeof Dog>;
+  void (null as unknown as DogInstance);
 
   // CONTRAST: 在 Rust 中，struct 只存在于类型层。
   //   你不能说 `let factory = User; factory("name")`
@@ -258,7 +260,7 @@ class TestDerived extends TestBase {
   }
 }
 
-type ClassTypeTests = {
+export type ClassTypeTests = {
   // InstanceType 提取实例类型
   t01_instance_type: InstanceType<typeof TestDerived> extends TestDerived ? true : false;
   // expected: true

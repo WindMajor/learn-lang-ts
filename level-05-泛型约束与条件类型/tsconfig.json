@@ -3,6 +3,9 @@
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    // noUnusedLocals/noUnusedParameters 设为 false：
+    //   本关有大量教学用的类型别名定义在函数内部（如 Test1、StrElement 等），
+    //   它们无法 export，但作为教学材料有其价值
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitOverride": true,

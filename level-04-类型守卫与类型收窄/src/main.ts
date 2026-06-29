@@ -141,9 +141,9 @@ function instanceofGuardDemo() {
     }
 
     if (error instanceof ApiError) {
-      // 收窄为 ApiError（注意：顺序很重要！
-      //   如果 ValidationError 先于 ApiError 检查，instanceof ApiError 也会匹配
-      //   因为 ValidationError 也是 ApiError 的子类）
+      // 收窄为 ApiError
+      //   注意：所有三个具体错误类（ValidationError/ApiError/NetworkError）都直接 extends Error，
+      //   因此必须在 instanceof Error 之前检查，否则会被 Error 分支拦截
       return `API 错误（${error.statusCode}）：${error.message}`;
     }
 

@@ -45,7 +45,9 @@ function varianceBasics() {
   // WHAT: 参数方向是逆变的——父类型参数可以赋值给子类型参数的位置
   //       但 strictFunctionTypes 只在方法签名中检查，回调函数类型才检查
   type AnimalHandler = (a: Animal) => void;
-  type DogHandler = (d: Dog) => void;
+  // DogHandler 类型用于演示逆变规则（仅类型层，值层不引用）
+  type _DogHandler = (d: Dog) => void;
+  void (null as unknown as _DogHandler);
 
   const handleAnimal: AnimalHandler = (a: Animal) => {
     console.log(`处理动物: ${a.name}`);
@@ -85,6 +87,7 @@ function arrayCovarianceTrap() {
 
   // ✅ 协变：Dog[] 可以赋值给 Animal[]
   const animals: Animal[] = dogs;
+  void animals; // animals 用于演示数组协变赋值
 
   // 💥 BUG 温床：通过 Animal[] 引用往 Dog[] 数组写入 Cat
   // animals.push(new Cat("Whiskers"));  // Animal[] 类型允许 push Animal
@@ -153,7 +156,7 @@ function overloadsDemo() {
   function on(event: "scroll", handler: (e: EventMap["scroll"]) => void): void;
   function on(
     event: string,
-    handler: (e: any) => void,
+    _handler: (e: any) => void,
   ): void {
     console.log(`注册事件: ${event}`);
   }
@@ -235,8 +238,8 @@ export type VarianceTests = {
 
   // 参数逆变（strictFunctionTypes）
   t02_param_contravariant: ((a: Animal) => void) extends ((d: Dog) => void) ? true : false;
-  // strictFunctionTypes: true → false（Animal 参数可以接受 Dog 调用）
-  //   但 (d: Dog) => void 期望 Dog，给的却是 Animal——不够精确
+  // strictFunctionTypes: true → true（由逆变规则：Dog ≤ Animal ⇒ (Animal) => void ≤ (Dog) => void）
+  //   解释：能处理任意 Animal 的函数，自然也能处理 Dog（Dog 是 Animal 的子类型）
 
   // 数组协变
   t03_array_covariant: Dog[] extends Animal[] ? true : false;

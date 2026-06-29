@@ -28,7 +28,8 @@ type Equal<X, Y> =
   (<T>() => T extends Y ? 1 : 2) ? true : false;
 
 // 运行测试套件（编译通过 = 测试通过）
-type TypeTests = [
+// export 使 TS 认为该类型可能被外部使用，不报告"未使用"
+export type TypeTests = [
   // 基础类型测试
   Expect<Equal<string, string>>,
   Expect<Equal<number, number>>,
@@ -84,7 +85,7 @@ type Add<A extends number, B extends number> = [
 ]["length"];
 
 // 验证加法
-type AddTests = [
+export type AddTests = [
   Expect<Equal<Add<1, 1>, 2>>,
   Expect<Equal<Add<2, 3>, 5>>,
   Expect<Equal<Add<0, 5>, 5>>,
@@ -183,7 +184,7 @@ type Pipe<T extends unknown[]> = T extends [
   (input: infer A) => infer B,
   ...infer Rest,
 ]
-  ? Rest extends [(input: infer B1) => infer C, ...infer Rest2]
+  ? Rest extends [(input: B) => infer C, ...infer Rest2]
     ? Pipe<[(input: A) => C, ...Rest2]>
     : (input: A) => B
   : never;
@@ -273,7 +274,7 @@ function typeSafeFormat() {
 // =============================================================
 
 // 这是一个"类型测试套件"——全部编译通过 = 所有测试通过
-type FullTestSuite = [
+export type FullTestSuite = [
   // 1. 加法测试
   Expect<Equal<Add<0, 0>, 0>>,
   Expect<Equal<Add<7, 8>, 15>>,
@@ -301,6 +302,12 @@ type FullTestSuite = [
   Expect<Equal<
     (string | number) extends never ? "A" : "B",
     "B"  // 整体不分配
+  >>,
+
+  // 7. Pipe 类型验证（管道函数组合的类型推断）
+  Expect<Equal<
+    Pipe<[(x: string) => number, (x: number) => boolean]>,
+    (input: string) => boolean
   >>,
 ];
 

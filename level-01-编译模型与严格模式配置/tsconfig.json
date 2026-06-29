@@ -51,9 +51,9 @@
     "skipLibCheck": true,
 
     // ============ 额外安全 ============
-    // WHAT: 在所有 switch 语句中进行类型收窄后，未处理的情况为 never
-    //       配合第 4 关的穷尽检查使用
-    // 注：TS 5.2+ 已默认启用此行为，但显式标出来
+    // WHAT: 启用后，`{ x?: number }` 中 `x` 的类型是 `number`（不含 undefined）
+    //       关闭时（默认），`x` 的类型是 `number | undefined`
+    //       这是一个可选开关，strict: true 不包含它，需手动开启
     "exactOptionalPropertyTypes": false
   },
   // 包含 src 目录下的所有 .ts 文件
