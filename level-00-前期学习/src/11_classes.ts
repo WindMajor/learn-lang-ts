@@ -33,7 +33,7 @@ class Animal {
   }
 }
 
-const dog = new Animal("Buddy", 3);
+const dog = new Animal('Buddy', 3);
 dog.move(10);
 
 // ==========================================
@@ -49,7 +49,7 @@ class BankAccount {
   constructor(owner: string, balance: number) {
     this.owner = owner;
     this.balance = balance;
-    this.accountType = "standard";
+    this.accountType = 'standard';
   }
 
   public deposit(amount: number): void {
@@ -63,7 +63,7 @@ class BankAccount {
   }
 }
 
-const account = new BankAccount("Alice", 1000);
+const account = new BankAccount('Alice', 1000);
 account.deposit(500);
 console.log(account.getBalance()); // 1500
 // console.log(account.balance); // ❌ 私有属性不可访问
@@ -74,19 +74,20 @@ console.log(account.getBalance()); // 1500
 // ==========================================
 
 class User {
-  // 一行声明 + 初始化 + 赋值
+  // 三件事合并了：类内属性声明 + 构造方法参数声明 + this赋值
   constructor(
     public readonly id: number,
     public name: string,
-    private email: string
+    private email: string,
   ) {}
+  // 规则很简单：构造函数参数前加上访问修饰符（public / private / protected / readonly），TypeScript 就会自动完成声明 + 赋值。
 
   getEmail(): string {
     return this.email;
   }
 }
 
-const user = new User(1, "Alice", "alice@example.com");
+const user = new User(1, 'Alice', 'alice@example.com');
 console.log(user.id, user.name);
 // user.id = 2; // ❌ readonly
 console.log(user.getEmail());
@@ -105,16 +106,16 @@ class Cat extends Animal {
   }
 
   override move(distance = 5): void {
-    console.log("Sneaking...");
+    console.log('Sneaking...');
     super.move(distance);
   }
 
   meow(): void {
-    console.log("Meow!");
+    console.log('Meow!');
   }
 }
 
-const kitty = new Cat("Whiskers", 2, "Persian");
+const kitty = new Cat('Whiskers', 2, 'Persian');
 kitty.move();
 kitty.meow();
 
@@ -142,7 +143,10 @@ class Circle extends Shape {
 }
 
 class Rectangle extends Shape {
-  constructor(private width: number, private height: number) {
+  constructor(
+    private width: number,
+    private height: number,
+  ) {
     super();
   }
 
@@ -153,6 +157,9 @@ class Rectangle extends Shape {
 
 const circle = new Circle(5);
 console.log(circle.describe());
+
+const rectangle = new Rectangle(2, 3);
+console.log(rectangle.getArea, rectangle.describe());
 
 // const shape = new Shape(); // ❌ 不能实例化抽象类
 
@@ -170,17 +177,17 @@ class Temperature {
 
   set celsius(value: number) {
     if (value < -273.15) {
-      throw new Error("Temperature below absolute zero!");
+      throw new Error('Temperature below absolute zero!');
     }
     this._celsius = value;
   }
 
   get fahrenheit(): number {
-    return this._celsius * 9 / 5 + 32;
+    return (this._celsius * 9) / 5 + 32;
   }
 
   set fahrenheit(value: number) {
-    this.celsius = (value - 32) * 5 / 9;
+    this.celsius = ((value - 32) * 5) / 9;
   }
 }
 
@@ -218,7 +225,10 @@ interface Serializable {
 }
 
 class Report implements Printable, Serializable {
-  constructor(public title: string, public content: string) {}
+  constructor(
+    public title: string,
+    public content: string,
+  ) {}
 
   print(): void {
     console.log(`Report: ${this.title}`);
@@ -230,7 +240,7 @@ class Report implements Printable, Serializable {
   }
 }
 
-const report = new Report("Q1 Summary", "Revenue increased by 20%");
+const report = new Report('Q1 Summary', 'Revenue increased by 20%');
 report.print();
 console.log(report.serialize());
 
