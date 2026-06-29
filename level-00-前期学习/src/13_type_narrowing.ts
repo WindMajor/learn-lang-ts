@@ -20,17 +20,17 @@
 // ==========================================
 
 function processValue(value: string | number | boolean): string {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return value.toUpperCase(); // 此处 value 被收窄为 string
   }
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     return value.toFixed(2); // 此处 value 被收窄为 number
   }
   // 此时 value 被收窄为 boolean
-  return value ? "YES" : "NO";
+  return value ? 'YES' : 'NO';
 }
 
-console.log(processValue("hello")); // HELLO
+console.log(processValue('hello')); // HELLO
 console.log(processValue(3.14159)); // 3.14
 console.log(processValue(true)); // YES
 
@@ -41,17 +41,18 @@ console.log(processValue(true)); // YES
 
 class Dog {
   bark(): void {
-    console.log("Woof!");
+    console.log('Woof!');
   }
 }
 
 class Cat {
   meow(): void {
-    console.log("Meow!");
+    console.log('Meow!');
   }
 }
 
 function makeSound(animal: Dog | Cat): void {
+  // typeof dog   得到 "object"（无法区分具体类）
   if (animal instanceof Dog) {
     animal.bark(); // 被收窄为 Dog
   } else {
@@ -71,7 +72,8 @@ type Car = { drive(): void; wheels: number };
 type Boat = { sail(): void; draft: number };
 
 function operate(vehicle: Car | Boat): void {
-  if ("drive" in vehicle) {
+  // 方法和属性都可以用 in 来区分类型， 'drive' in vehicle 和 wheels in vehicle 都行
+  if ('drive' in vehicle) {
     vehicle.drive(); // 被收窄为 Car
   } else {
     vehicle.sail(); // 被收窄为 Boat
@@ -80,14 +82,14 @@ function operate(vehicle: Car | Boat): void {
 
 const car: Car = {
   drive() {
-    console.log("Driving on road");
+    console.log('Driving on road');
   },
   wheels: 4,
 };
 
 const boat: Boat = {
   sail() {
-    console.log("Sailing on water");
+    console.log('Sailing on water');
   },
   draft: 2.5,
 };
@@ -100,23 +102,23 @@ operate(boat);
 // 使用场景：可辨识联合中的分支判断
 // ==========================================
 
-type LoadingState = { status: "loading" };
-type SuccessState = { status: "success"; data: string };
-type ErrorState = { status: "error"; message: string };
+type LoadingState = { status: 'loading' };
+type SuccessState = { status: 'success'; data: string };
+type ErrorState = { status: 'error'; message: string };
 
 type AsyncState = LoadingState | SuccessState | ErrorState;
 
 function render(state: AsyncState): string {
-  if (state.status === "loading") {
-    return "加载中...";
+  if (state.status === 'loading') {
+    return '加载中...';
   }
-  if (state.status === "success") {
+  if (state.status === 'success') {
     return `数据: ${state.data}`;
   }
   return `错误: ${state.message}`;
 }
 
-console.log(render({ status: "success", data: "hello" }));
+console.log(render({ status: 'success', data: 'hello' }));
 
 // ==========================================
 // 示例 5：自定义类型保护函数（parameter is Type）
@@ -133,8 +135,9 @@ interface Fish {
   layEggs(): void;
 }
 
+// 运行时返回boolean类型，也告诉 TypeScript "如果返回 true，参数就是 Bird 类型
 function isBird(animal: Bird | Fish): animal is Bird {
-  return "fly" in animal;
+  return 'fly' in animal;
 }
 
 function move(animal: Bird | Fish): void {
@@ -147,10 +150,10 @@ function move(animal: Bird | Fish): void {
 
 const bird: Bird = {
   fly() {
-    console.log("Flying");
+    console.log('Flying');
   },
   layEggs() {
-    console.log("Laying eggs");
+    console.log('Laying eggs');
   },
 };
 
@@ -169,16 +172,11 @@ interface ApiUser {
 
 function isApiUser(obj: unknown): obj is ApiUser {
   return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "id" in obj &&
-    typeof (obj as Record<string, unknown>).id === "number" &&
-    "name" in obj &&
-    typeof (obj as Record<string, unknown>).name === "string"
+    typeof obj === 'object' && obj !== null && 'id' in obj && typeof (obj as any).id === 'number' && 'name' in obj && typeof (obj as any).name === 'string'
   );
 }
 
-const rawData: unknown = { id: 1, name: "Alice", email: "a@example.com" };
+const rawData: unknown = { id: 1, name: 'Alice', email: 'a@example.com' };
 if (isApiUser(rawData)) {
   console.log(`User: ${rawData.name}`);
 }
@@ -188,24 +186,24 @@ if (isApiUser(rawData)) {
 // 使用场景：处理多种相关但结构不同的数据类型
 // ==========================================
 
-type Circle = { kind: "circle"; radius: number };
-type Rectangle = { kind: "rectangle"; width: number; height: number };
-type Triangle = { kind: "triangle"; base: number; height: number };
+type Circle = { kind: 'circle'; radius: number };
+type Rectangle = { kind: 'rectangle'; width: number; height: number };
+type Triangle = { kind: 'triangle'; base: number; height: number };
 
 type Shape = Circle | Rectangle | Triangle;
 
 function describeShape(shape: Shape): string {
   switch (shape.kind) {
-    case "circle":
+    case 'circle':
       return `圆，半径 ${shape.radius}`;
-    case "rectangle":
+    case 'rectangle':
       return `矩形，${shape.width} x ${shape.height}`;
-    case "triangle":
+    case 'triangle':
       return `三角形，底 ${shape.base} 高 ${shape.height}`;
   }
 }
 
-console.log(describeShape({ kind: "circle", radius: 5 }));
+console.log(describeShape({ kind: 'circle', radius: 5 }));
 
 // ==========================================
 // 示例 8：switch + never 穷尽检查
@@ -214,11 +212,11 @@ console.log(describeShape({ kind: "circle", radius: 5 }));
 
 function getAreaSafe(shape: Shape): number {
   switch (shape.kind) {
-    case "circle":
+    case 'circle':
       return Math.PI * shape.radius ** 2;
-    case "rectangle":
+    case 'rectangle':
       return shape.width * shape.height;
-    case "triangle":
+    case 'triangle':
       return (shape.base * shape.height) / 2;
     default:
       const _exhaustive: never = shape;
@@ -233,14 +231,14 @@ function getAreaSafe(shape: Shape): number {
 
 function process(input: string | number | string[] | null): string {
   if (input === null) {
-    return "null input";
+    return 'null input';
   }
 
   if (Array.isArray(input)) {
     return `array with ${input.length} items`;
   }
 
-  if (typeof input === "string") {
+  if (typeof input === 'string') {
     return `string: ${input}`;
   }
 
@@ -248,9 +246,9 @@ function process(input: string | number | string[] | null): string {
   return `number: ${input}`;
 }
 
-console.log(process("hello"));
+console.log(process('hello'));
 console.log(process(42));
-console.log(process(["a", "b"]));
+console.log(process(['a', 'b']));
 console.log(process(null));
 
 // ==========================================
@@ -258,7 +256,7 @@ console.log(process(null));
 // ==========================================
 
 function wrongNarrow(value: string | number): void {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     console.log(value.toUpperCase());
   }
   // @ts-expect-error 类型收窄后，在块外访问已排除类型的方法会报错：value 仍可能是 number
