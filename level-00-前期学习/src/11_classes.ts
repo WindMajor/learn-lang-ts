@@ -104,7 +104,7 @@ class Cat extends Animal {
     this.breed = breed;
   }
 
-  move(distance = 5): void {
+  override move(distance = 5): void {
     console.log("Sneaking...");
     super.move(distance);
   }

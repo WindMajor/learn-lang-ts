@@ -1,0 +1,10 @@
+{
+  "name": "learn-lang-ts",
+  "private": true,
+  "description": "TypeScript 高级类型系统闯关项目",
+  "scripts": {
+    "check": "pnpm -r run check",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test"
+  }
+}

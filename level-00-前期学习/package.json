@@ -13,16 +13,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "11.5.1",
-      "onFail": "download"
-    }
-  },
   "type": "module",
   "devDependencies": {
-    "@types/node": "^24.12.4",
+    "@types/node": "^24.0.0",
     "tsx": "^4.22.4",
     "typescript": "^5.8.3"
   }

@@ -1,6 +1,6 @@
 # TypeScript 系统化学习项目
 
-本项目是一个面向有 **Python / Java ** 基础的开发者的 TypeScript 系统化学习资源。通过 20 个精心设计的 `.ts` 文件，从变量声明到高级类型工具，循序渐进地掌握 TypeScript 的核心知识体系。
+本项目是一个面向有 **Python / Java ** 基础的开发者的 TypeScript 系统化学习资源。通过 27 个精心设计的 `.ts` 文件，从变量声明到浏览器 API，循序渐进地掌握 TypeScript 的核心知识体系。
 
 ## 前期学习记录
 
@@ -33,6 +33,8 @@ TypeScript 是 JavaScript 的超集，添加了静态类型系统和现代语言
 
 ## 文件索引表
 
+### TypeScript 核心（01-20）
+
 | 序号 | 文件名                             | 对应 Rust 概念                 | 核心知识点                                                           |
 | :--: | :--------------------------------- | :----------------------------- | :------------------------------------------------------------------- |
 |  01  | `01_variables.ts`                  | `let` / `const` 绑定           | let/const/var、类型注解、类型推断、解构赋值                          |
@@ -55,6 +57,18 @@ TypeScript 是 JavaScript 的超集，添加了静态类型系统和现代语言
 |  18  | `18_advanced_types.ts`             | 类型级编程（有限对应）         | 内置工具类型、映射类型、模板字面量类型、递归类型                     |
 |  19  | `19_declaration_files.ts`          | FFI / 外部声明                 | .d.ts 规范、declare 关键字、全局声明、模块扩充                       |
 |  20  | `20_comprehensive.ts`              | 综合实战                       | Result<T, E>、API 接口、可辨识联合、泛型缓存、类型守卫、综合复习问答 |
+
+### JavaScript 运行时与浏览器扩展（21-27）
+
+| 序号 | 文件名                           | 主题               | 核心知识点                                                        |
+| :--: | :------------------------------- | :----------------- | :---------------------------------------------------------------- |
+|  21  | `21_js_runtime_traps.ts`         | JS 运行时陷阱      | == 陷阱、falsy 值、typeof 怪癖、浮点数精度、ASI、JSON.stringify   |
+|  22  | `22_prototype_and_this.ts`       | 原型链与 this      | 原型链、ES6 class 语法糖、this 四种绑定、箭头函数、闭包私有       |
+|  23  | `23_event_loop_and_closure.ts`   | 事件循环与闭包     | 事件循环、宏/微任务、闭包与内存、变量提升/TDZ、定时器精度         |
+|  24  | `24_dom_and_events.ts`           | DOM 与事件         | querySelector 泛型、DOM 操作、事件流三阶段、事件委托、CustomEvent  |
+|  25  | `25_css_for_developers.ts`       | CSS 基础           | 盒模型、Flexbox/Grid、响应式、CSS 变量、优先级、BFC、性能优化     |
+|  26  | `26_browser_api.ts`              | 浏览器 API         | Fetch API、Storage、Cookie、Web Worker、Canvas、CORS、性能 API     |
+|  27  | `27_html_semantic.ts`            | HTML 语义化        | 语义化标签、表单、无障碍 ARIA、SEO/meta、Shadow DOM、资源加载     |
 
 ## 编译命令
 

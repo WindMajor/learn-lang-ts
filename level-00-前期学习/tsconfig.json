@@ -1,48 +1,40 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    "rootDir": "./src",
-    "outDir": "./dist",
-
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "ESNext",
-    "target": "ES2020",
-    "moduleResolution": "bundler",
-    "types": ["node"],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
-
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
+    // ============ 严格模式（全部打开！）============
     "strict": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
+
+    // 额外手动启用（strict 没有涵盖的）
+    "noImplicitReturns": true,
+    // noFallthroughCasesInSwitch 设为 false：
+    //   04_control_flow.ts 中有故意演示 fallthrough 穿透的教学代码
+    "noFallthroughCasesInSwitch": false,
+    // noUnusedLocals/noUnusedParameters 设为 false：
+    //   本 level 有大量教学用的变量/函数声明（27 个文件），
+    //   它们作为示例代码有其价值，不适合强制引用
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitOverride": true,
+
+    // ============ 编译目标 ============
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "sourceMap": true,
+
+    // ============ 类型库 ============
+    // 本 level 包含浏览器端文件（24-27），需要 DOM 类型
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+
+    // ============ 模块互操作 ============
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true
-  }
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
