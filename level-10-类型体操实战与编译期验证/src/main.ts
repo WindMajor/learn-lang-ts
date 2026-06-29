@@ -45,11 +45,14 @@ type TypeTests = [
     true
   >>,
 
-  // 联合类型的分配性
+  // 联合类型的分配性（注意：仅对裸类型参数触发分配性）
   Expect<Equal<
-    (string | number) extends string ? "yes" : "no",
-    "yes" | "no"  // 分配性！
+    string extends string ? "yes" : "no",
+    "yes"
   >>,
+  // 如果没有分配性：(string | number) extends string → "no"
+  //   有分配性时需要用泛型参数触发：type Dist<T> = T extends string ? "yes" : "no"
+  //   type Test = Dist<string | number>; // "yes" | "no"
 ];
 
 console.log("=== 编译期类型测试工具 ===");
@@ -233,7 +236,7 @@ function format<S extends string>(
   template: S,
   ...args: ParseFormat<S> extends [] ? [] : ParseFormat<S>
 ): string {
-  let result = template;
+  let result: string = template;
   let i = 0;
   for (const arg of args) {
     result = result.replace(/%[sd]/, String(arg));

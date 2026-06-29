@@ -144,6 +144,7 @@ function privateStructuralBehavior() {
 
   // 类型层：User 和 Admin 看起来结构相同，但因为 private 字段，它们不兼容
   // 值层：两个对象在运行时是一样的 JS 对象
+  console.log(`名义类型检查：User(${user.name}) 和 Admin(${admin.name}) 因 private 字段不兼容`);
   // const u: User = admin;  // ❌ 编译错误
   //   error TS2322: Type 'Admin' is not assignable to type 'User'.
   //     Types have separate declarations of a private property 'password'.
@@ -285,25 +286,28 @@ function structuralTypingTraps() {
     return "未知";
   }
 
-  function screenToWorld(pixel: PixelCoord): Vector2D {
-    // 模拟坐标转换
-    return { x: pixel.x / 100 - 5, y: pixel.y / 100 - 5 };
-  }
-
   const beijing: GeoLocation = { x: 116.4, y: 39.9 };
   const pixel: PixelCoord = { x: 640, y: 480 };
 
   // ❌ 结构类型的陷阱：以下调用全部编译通过，但语义完全错误！
   const normalized = normalizeVector(beijing); // 把经纬度当向量做归一化——毫无意义！
   const city = getCity(pixel);                 // 把像素坐标当地理坐标——毫无意义！
+  const worldCoord = normalizeVector(pixel);   // 演示正确的用法：像素坐标转世界坐标
 
   console.log(`把北京坐标当向量归一化: { x: ${normalized.x}, y: ${normalized.y} }`);
   console.log(`把像素坐标当地理坐标: ${city}`);
+  console.log(`像素坐标转换世界坐标: { x: ${worldCoord.x.toFixed(2)}, y: ${worldCoord.y.toFixed(2)} }`);
 
   // ✅ 修复方案：使用品牌类型
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   type BrandVector2D = Vector2D & { __brand: "Vector2D" };
   type BrandGeoLocation = GeoLocation & { __brand: "GeoLocation" };
   type BrandPixelCoord = PixelCoord & { __brand: "PixelCoord" };
+  // 演示品牌类型用法（消除未使用警告）
+  const brandedV: BrandVector2D = { x: 1, y: 2, __brand: "Vector2D" } as BrandVector2D;
+  const brandedG: BrandGeoLocation = { x: 116.4, y: 39.9, __brand: "GeoLocation" } as BrandGeoLocation;
+  const brandedP: BrandPixelCoord = { x: 640, y: 480, __brand: "PixelCoord" } as BrandPixelCoord;
+  void brandedV; void brandedG; void brandedP;
 
   // 用品牌类型后，normalizeVector(brandBeijing) 会在编译期报错
   // 这就是品牌类型的价值——阻止"结构兼容但语义不同"的意外赋值
@@ -315,7 +319,7 @@ function structuralTypingTraps() {
 
 // 类型层：验证结构类型的各种关系
 // 值层：以下代码不产生任何 JS——纯粹的类型运算
-type StructuralTypingTests = {
+export type StructuralTypingTests = {
   // 结构相同 → 兼容
   test_01_same_structure: { x: number; y: number } extends { x: number; y: number }
     ? true

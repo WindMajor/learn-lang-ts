@@ -33,26 +33,27 @@ function typeHierarchyDemo() {
 
   // 类型层：以下类型层级关系在编译期成立
   // 值层：这些 type 语句在运行时不存在
+  // 使用 const 类型标注来触发编译期验证并避免 noUnusedLocals
 
   // never（底层类型）→ 任何类型的子类型
   //   never 是空集，没有任何值属于 never
-  type NeverSubtype1 = never extends string ? true : false;          // true
-  type NeverSubtype2 = never extends number ? true : false;          // true
-  type NeverSubtype3 = never extends { x: number } ? true : false;  // true
+  console.log("never extends string: true (编译期验证)");
+  void (true as (never extends string ? true : false));
+  void (true as (never extends number ? true : false));
+  void (true as (never extends { x: number } ? true : false));
   // never 可以赋值给任何类型，因为"什么都匹配不了的值"可以匹配所有约束
   // 这听起来反直觉，但在类型系统中是正确的：空集是所有集合的子集
 
   // unknown（顶层类型）→ 任何类型的超类型
-  //   any 的类型也可以赋值给 unknown，但 unknown 不能赋值给其他类型
-  type UnknownSupertype1 = string extends unknown ? true : false;      // true
-  type UnknownSupertype2 = number extends unknown ? true : false;      // true
-  type UnknownSupertype3 = { x: number } extends unknown ? true : false; // true
+  console.log("unknown 是所有类型的超类型 (编译期验证)");
+  void (true as (string extends unknown ? true : false));
+  void (true as (number extends unknown ? true : false));
+  void (true as ({ x: number } extends unknown ? true : false));
 
   // 中间层级的包含关系
-  type StringIsObject = string extends object ? true : false;  // false！
-  //   string 是 primitive，不是 object
-  type ObjectIsEmptyObject = { x: number } extends {} ? true : false; // true
-  //   任何对象都是 `{}` 的子类型（见 Level 02 的陷阱）
+  void (false as (string extends object ? true : false));
+  console.log("string 不是 object 的子类型（primitive vs object）");
+  void (true as ({ x: number } extends {} ? true : false));
 
   console.log("类型层级在编译期已验证 ✅");
   console.log("never 是任何类型的子类型");
@@ -204,8 +205,8 @@ function intersectionTypesDemo() {
 
   type AB = A & B;
   // AB 的类型：{ x: number & string; y: string; z: boolean }
-  // x: number & string → 没有值同时是 number 和 string → never
-  // 因此 x 的类型是 never，AB 类型的 x 永远无法赋值
+  const _abDemo: AB = null! as unknown as AB; // 演示交叉类型的冲突字段（实际无法构造）
+  void _abDemo;
 
   // 值层：你实际上无法创建满足这个交叉类型的值
   // const ab: AB = { x: ???, y: "hello", z: true };  // x 无法赋值！
@@ -252,6 +253,11 @@ function literalTypesAndAsConst() {
   type HttpStatus = 200 | 301 | 404 | 500;
   type YesOrNo = true | false;
 
+  // 演示 HttpStatus 和 YesOrNo 用法（编译期字面量类型）
+  const _httpOk: HttpStatus = 200;
+  const _yesValue: YesOrNo = true;
+  void _httpOk; void _yesValue;
+
   // 值层：函数只能接受精确的字面量值
   function move(direction: Direction, distance: number): string {
     return `向 ${direction} 移动 ${distance} 米`;
@@ -271,6 +277,7 @@ function literalTypesAndAsConst() {
     port: 8080,           // 推断为 number（不是 8080）
     debug: true,          // 推断为 boolean（不是 true）
   };
+  console.log(`默认推断 config1.port 类型: ${typeof config1.port}（扩大为 number，非字面量）`);
   // config1.host = "other";  // ✅ 允许（推断为 string，所以可以改值）
 
   // as const——类型冻结为最窄
@@ -287,6 +294,7 @@ function literalTypesAndAsConst() {
   // as const 对数组也有作用——变成只读元组
   const colors = ["red", "green", "blue"];           // string[]
   const frozenColors = ["red", "green", "blue"] as const; // readonly ["red", "green", "blue"]
+  console.log(`colors (${colors.length} 个) vs frozenColors 只读元组 (${frozenColors[0]})`);
 
   // colors.push("yellow");       // ✅ 可以修改
   // frozenColors.push("yellow"); // ❌ 只读数组，无法修改
@@ -297,6 +305,7 @@ function literalTypesAndAsConst() {
   // Object.freeze 是值层面的冻结（运行时），类型推断仍然是可变的
   const frozenAtRuntime = Object.freeze({ key: "value" });
   // frozenAtRuntime 的类型仍是 { key: string }，不是 { readonly key: "value" }
+  console.log(`Object.freeze 不改变类型推断: ${frozenAtRuntime.key}`);
   // 要同时冻结类型和值：用 as const（TS 4.5+ 自动识别 Object.freeze）
 }
 
@@ -318,6 +327,7 @@ function satisfiesOperator() {
     green: "#00FF00",
     sizes: [16, 24, 32],
   };
+  console.log(`palette1.red 类型扩大为 string | number[]（${palette1.red}），无法安全调用 .toUpperCase()`);
 
   // palette1.red 的类型是 string | number[]（来自 Record 的映射）
   // 所以这行在类型层面合法，但运行时错误：
@@ -421,7 +431,7 @@ function typeAssertions() {
 // 第七部分：编译期类型验证
 // =============================================================
 
-type TypeHierarchyTests = {
+export type TypeHierarchyTests = {
   // never 是所有类型的子类型
   t01_never_subtype: never extends unknown ? true : false;
   // expected: true —— never 可赋值给 unknown
@@ -471,8 +481,8 @@ function main(): void {
 
   console.log("\n=== 关卡完成 ===");
   console.log("核心认知：TS 的类型层级从 never（底层）到 unknown（顶层）。");
-  console.log("联合类型是一组可能性的"或"，交叉类型是特征的组合"且"。");
-  console.log("satisfies 比类型标注更适合"验证而不改变推断"的场景。");
+  console.log('联合类型是一组可能性的\u201C或\u201D，交叉类型是特征的组合\u201C且\u201D。');
+  console.log('satisfies 比类型标注更适合\u201C验证而不改变推断\u201D的场景。');
 }
 
 main();

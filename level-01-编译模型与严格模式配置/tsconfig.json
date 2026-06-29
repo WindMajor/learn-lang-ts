@@ -35,8 +35,10 @@
     "sourceMap": true,
 
     // ============ 类型库 ============
-    // WHAT: 只引用 ES2022 + DOM 类型定义（Node.js 项目不需要 DOM）
+    // WHAT: 只引用 ES2022 类型定义（Node.js 项目不需要 DOM）
     "lib": ["ES2022"],
+    // WHAT: 使用 Node.js 类型定义（提供 console、process 等全局变量）
+    "types": ["node"],
 
     // ============ 模块互操作 ============
     // WHAT: 允许 `import React from 'react'` 这种写法（即使模块没有默认导出）

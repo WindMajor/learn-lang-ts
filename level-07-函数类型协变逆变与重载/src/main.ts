@@ -13,21 +13,22 @@
 
 // ========== 第一部分：协变逆变基本概念 ==========
 
+// 模块级类型定义（供 VarianceTests 和多个函数使用）
+class Animal {
+  constructor(public name: string) {}
+}
+class Dog extends Animal {
+  bark(): string {
+    return `${this.name}: Woof!`;
+  }
+}
+
 function varianceBasics() {
   console.log("=== 协变逆变基本概念 ===");
 
   // WHAT: 协变——子类型可以赋值给父类型（返回值方向）
   // CONTRAST: Rust 中所有类型默认不变（invariant），没有协变/逆变
   // CONTRAST: Kotlin 中用 out（协变）和 in（逆变）在声明处标记
-
-  class Animal {
-    constructor(public name: string) {}
-  }
-  class Dog extends Animal {
-    bark(): string {
-      return `${this.name}: Woof!`;
-    }
-  }
 
   const dog = new Dog("Rex");
 
@@ -152,7 +153,7 @@ function overloadsDemo() {
   function on(event: "scroll", handler: (e: EventMap["scroll"]) => void): void;
   function on(
     event: string,
-    handler: (e: unknown) => void,
+    handler: (e: any) => void,
   ): void {
     console.log(`注册事件: ${event}`);
   }
@@ -227,7 +228,7 @@ function thisParameterDemo() {
 // ========== 编译期验证 ==========
 
 // 验证协变逆变关系（strictFunctionTypes: true）
-type VarianceTests = {
+export type VarianceTests = {
   // 返回值协变
   t01_return_covariant: (() => Dog) extends (() => Animal) ? true : false;
   // expected: true

@@ -126,7 +126,7 @@ function noImplicitAnyDemo() {
   const name = "TypeScript";         // 推断为 string
   const count = 42;                  // 推断为 number
   const items = [1, 2, 3];          // 推断为 number[]
-  const user = {                     // 推断为 { name: string; age: number }
+  const _user = {                     // 推断为 { name: string; age: number }
     name: "Alice",
     age: 30,
   };
@@ -139,7 +139,7 @@ function noImplicitAnyDemo() {
     return a + b;
   }
 
-  console.log(`name: ${name}, count: ${count}, doubled: ${doubled}`);
+  console.log(`name: ${name}, count: ${count}, user: ${_user.name}, doubled: ${doubled}`);
   console.log(`add(1, 2) = ${add(1, 2)}`);
 
   // 下面的代码如果有 noImplicitAny = true，tsc 会报错：
@@ -166,34 +166,48 @@ function noImplicitAnyDemo() {
 
 // 类型层：这些 type 语句在编译期计算并验证
 // 值层：这些 type 在运行时不存在（不生成任何 JS 代码）
-type CompileTimeTests = {
-  // 验证：string 类型推断正确
-  test_01_typeof_string: typeof "hello" extends string ? true : false;
-  // expected: true
 
-  // 验证：number 不是 string
-  test_02_number_not_string: number extends string ? true : false;
-  // expected: false
+// 编译期断言工具类型：只有传入 true 才能编译通过
+// 用法：type _Check = Assert<期望为true的条件类型>;
+type Assert<T extends true> = T;
 
-  // 验证：null 不是 string（strictNullChecks 打开时）
-  test_03_null_not_string: null extends string ? true : false;
-  // expected: false —— 如果 strictNullChecks 关闭，结果是 true
+// ============ 编译期类型验证 ============
+// 以下每个 type 如果编译不通过，说明类型关系不符合预期
 
-  // 验证：联合类型
-  test_04_union: "a" | "b" extends string ? true : false;
-  // expected: true
+// 验证01：字面量 "hello" 是 string 的子类型（typeof 在类型位置只能用于标识符，不能用于字面量）
+const helloLiteral = "hello";
+type _01 = typeof helloLiteral extends string ? true : false;
+//   条件类型结果：true ✅（typeof helloLiteral = "hello" extends string）
+type Test01_TypeofString = Assert<_01>;
 
-  // 验证：never 是任何类型的子类型（底层类型）
-  test_05_never_is_subtype: never extends string ? true : false;
-  // expected: true
-};
+// 验证02：number 不是 string 的子类型
+//   number extends string → false，因此 ? false : true → true → Assert<true> 通过
+type Test02_NumberNotString = Assert<number extends string ? false : true>;
 
-// 如果你想"断言"某个类型关系成立，用下面的模式：
-// type Assert<T extends true> = T;
-// type _Test1 = Assert<CompileTimeTests["test_01_typeof_string"]>;  // 编译通过 ✅
-// 如果你期望错误：
-// type _Test2 = Assert<CompileTimeTests["test_03_null_not_string"]>;
-//   → 如果 strictNullChecks 关闭，null extends string 为 true，编译失败 ❌
+// 验证03：null 不是 string 的子类型（strictNullChecks 打开时）
+//   如果 strictNullChecks 关闭，null extends string 为 true → ? false : true → false → Assert<false> 编译失败
+type Test03_NullNotString = Assert<null extends string ? false : true>;
+
+// 验证04：联合类型 "a" | "b" extends string
+type _04 = ("a" | "b") extends string ? true : false;
+//   条件类型结果：true ✅
+type Test04_Union = Assert<_04>;
+
+// 验证05：never 是任何类型的子类型（底层类型）
+type _05 = never extends string ? true : false;
+//   条件类型结果：true ✅
+type Test05_NeverIsSubtype = Assert<_05>;
+
+// 编译期断言汇总：引用所有断言类型，消除 noUnusedLocals 警告
+// export 使 TS 认为该类型可能被外部使用，不再报告"未使用"
+// 这是一条"类型注释"——编译后会完全消失
+export type _AllCompileTimeAssertions = [
+  Test01_TypeofString,
+  Test02_NumberNotString,
+  Test03_NullNotString,
+  Test04_Union,
+  Test05_NeverIsSubtype,
+];
 
 // =============================================================
 // 第五部分：查看编译产物 —— 理解类型擦除

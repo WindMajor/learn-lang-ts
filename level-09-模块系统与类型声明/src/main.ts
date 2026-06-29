@@ -49,6 +49,7 @@ function exportImportSyntax() {
 // ========== 第二部分：声明文件（.d.ts）==========
 
 // 声明一个"库"的类型——模拟 lodash 的类型声明
+// @ts-expect-error: 教学演示——声明不存在的模块，展示 .d.ts 的模式
 declare module "imaginary-lodash" {
   export function chunk<T>(array: T[], size: number): T[][];
   export function debounce<T extends (...args: unknown[]) => unknown>(

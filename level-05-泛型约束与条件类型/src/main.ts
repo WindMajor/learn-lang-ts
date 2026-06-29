@@ -339,7 +339,7 @@ function main(): void {
 
   console.log("\n=== 关卡完成 ===");
   console.log("核心认知：泛型在编译期擦除（与 Java 同，与 Rust 异）。");
-  console.log("条件类型是 TS 独有的"类型层面计算"能力——Rust/Java 都没有直接对应。");
+  console.log('条件类型是 TS 独有的\u201C类型层面计算\u201D能力——Rust/Java 都没有直接对应。');
   console.log("分配性是条件类型最反直觉但也最强大的特性。");
   console.log("infer 是解构类型的瑞士军刀。");
 }

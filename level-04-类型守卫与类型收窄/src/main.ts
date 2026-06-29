@@ -403,20 +403,19 @@ function cfaLimitations() {
     // 假设我们先过滤掉 null
     const filtered = values.filter((v) => v !== null);
     // filtered 的类型：number[]（严格模式下 filter 做了收窄）
-    // ✅ 这里安全
+    result.push(...filtered);
 
     // 但考虑这种情况：
     let value: string | null = "hello";
     if (value !== null) {
-      // value 的类型：string（在 if 块内，收窄有效）
-      console.log(`收窄后大写: ${value.toUpperCase()}`);
+      // 安全：先将值捕获到 const 中，防止后续修改
+      const captured = value;
+      console.log(`收窄后大写: ${captured.toUpperCase()}`);
 
       // 闭包陷阱：在 setTimeout 回调中访问 value
       setTimeout(() => {
-        // value 的类型？TS 认为它是 string
-        // 但如果 setTimeout 回调执行前，value 被改成了 null？
-        // 实际上这里 value 是 `let`，可能被重新赋值
-        console.log(`闭包中的 value: ${value.toUpperCase()}`);
+        // captured 是 const，不会被修改，类型安全
+        console.log(`闭包中的 value: ${captured.toUpperCase()}`);
       }, 100);
     }
 
@@ -480,23 +479,35 @@ function cfaLimitations() {
 // 类型层：验证类型收窄的关系
 // 注意：isUser 定义在 customTypePredicateDemo 函数内部，无法在此引用
 //       这里仅验证可访问的全局类型关系
-type GuardTests = {
-  // typeof 收窄：typeof "" 返回 "string" 字面量类型
-  t01_typeof_string: (typeof "" extends "string" ? true : false);
-  // expected: true
 
-  // instanceof 与实际类型的关系
-  t02_error_extends_object: Error extends object ? true : false;
-  // expected: true
+// 编译期断言工具类型
+type Assert<T extends true> = T;
 
-  // never 与所有类型的子类型关系
-  t03_never_extends_object: never extends object ? true : false;
-  // expected: true
+// typeof 收窄：typeof 变量返回字面量字符串类型
+const _testValue = "";
+type T01_TypeofGuard = Assert<typeof _testValue extends string ? true : false>;
+// expected: true ✅
 
-  // 函数返回值类型
-  t04_function_return: (() => string | null) extends (() => string | number | null) ? true : false;
-  // expected: true —— 返回值协变（string 可以赋值给 string | number | null）
-};
+// instanceof 与实际类型的关系
+type T02_ErrorExtendsObject = Assert<Error extends object ? true : false>;
+// expected: true ✅
+
+// never 与所有类型的子类型关系
+type T03_NeverExtendsObject = Assert<never extends object ? true : false>;
+// expected: true ✅
+
+// 函数返回值类型（协变）
+type T04_FunctionReturn = Assert<(() => string | null) extends (() => string | number | null) ? true : false>;
+// expected: true ✅
+
+// 编译期断言汇总：引用所有断言类型，避免 noUnusedLocals 警告
+// export 使 TS 认为该类型可能被外部使用
+export type _GuardAssertions = [
+  T01_TypeofGuard,
+  T02_ErrorExtendsObject,
+  T03_NeverExtendsObject,
+  T04_FunctionReturn,
+];
 
 // =============================================================
 // 主入口
@@ -512,7 +523,7 @@ function main(): void {
 
   console.log("\n=== 关卡完成 ===");
   console.log("核心认知：TS 有 5 种类型守卫机制，但控制流分析有明确的局限。");
-  console.log("is 谓词是定义"编译期信任"的桥梁——需要你手动保证正确性。");
+  console.log('is 谓词是定义\u201C编译期信任\u201D的桥梁——需要你手动保证正确性。');
   console.log("never 穷尽检查是维护 discriminated union 的最佳实践。");
 }
 
