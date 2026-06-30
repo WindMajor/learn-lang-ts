@@ -33,7 +33,7 @@ class Document implements Printable {
   }
 }
 
-printItem(new Document("Report"));
+printItem(new Document('Report'));
 
 // ==========================================
 // 示例 2：多个约束条件
@@ -108,43 +108,47 @@ console.log(collectAll(iter)); // [1, 2, 3]
 // 示例 4：条件类型（Conditional Types）
 // 使用场景：根据类型关系选择不同的类型
 // ==========================================
-
+// 这里的 extends 不是传统 OOP 的继承，而是类型系统中的兼容性判断或子类型关系
 type IsString<T> = T extends string ? true : false;
 
-type A = IsString<string>; // true
-type B = IsString<number>; // false
+type A = IsString<string>; // A是字面量类型true
+type B = IsString<number>; // B是字面量类型false
 
 // 实际应用：提取类型中的某部分
 type NonNullable<T> = T extends null | undefined ? never : T;
 
 type MaybeString = string | null | undefined;
-type DefiniteString = NonNullable<MaybeString>; // string
+type DefiniteString = NonNullable<MaybeString>; // 类型明确是 string
 
 // ==========================================
 // 示例 5：infer 关键字 —— 类型推断
 // 使用场景：从复杂类型中提取子类型
 // ==========================================
 
-// 提取 Promise 的返回值类型
+// 场景1：提取 Promise 的返回值类型
+// T如果是被Promise包裹的类型，那么就从Promise中取出被包裹的类型，作为最终类型。否则就使用原类型T
 type PromiseType<T> = T extends Promise<infer R> ? R : T;
 
 type P = PromiseType<Promise<string>>; // string
 type Q = PromiseType<number>; // number
 
-// 提取函数返回类型
+// 场景2：提取函数返回类型
+// T如果是一个函数类型（包括箭头函数和所有函数类型），那就把箭头函数的返回值作为最终返回值，否则就是never类型（传入了非函数的类型，比如基本类型、对象等）
 type ReturnTypeOf<T> = T extends (...args: unknown[]) => infer R ? R : never;
+// 在条件类型的 false 分支返回 never，当传入非法类型时，结果类型会被排除（联合类型中自动消失），从而实现类型约束
 
 function greet(): string {
-  return "hello";
+  return 'hello';
 }
 
-type GreetReturn = ReturnTypeOf<typeof greet>; // string
+type GreetReturn = ReturnTypeOf<typeof greet>; // 得到string类型
 
-// 提取数组元素类型
+// 场景3：提取数组元素类型
+// T如果是一个数组类型，那就把数组内的元素类型提取出来作为最终的类型，否则就是never类型
 type ElementType<T> = T extends (infer E)[] ? E : never;
 
 type NumArr = number[];
-type Num = ElementType<NumArr>; // number
+type Num = ElementType<NumArr>; // 得到number类型
 
 // ==========================================
 // 示例 6：映射类型（Mapped Types）基础
@@ -159,6 +163,8 @@ interface User {
 
 // 将所有属性变为可选
 type PartialUser = {
+  // K in keyof User 拿到左边的属性名："name" | "age" | "email"
+  // User[k] 拿到右边的属性类型 string | number| string
   [K in keyof User]?: User[K];
 };
 
@@ -167,9 +173,9 @@ type ReadonlyUser = {
   readonly [K in keyof User]: User[K];
 };
 
-const partialUser: PartialUser = { name: "Alice" }; // age 和 email 可省略
-const readonlyUser: ReadonlyUser = { name: "Bob", age: 30, email: "b@example.com" };
-// readonlyUser.name = "Charlie"; // ❌
+const partialUser: PartialUser = { name: 'Alice' }; // age 和 email 可省略
+const readonlyUser: ReadonlyUser = { name: 'Bob', age: 30, email: 'b@example.com' };
+// readonlyUser.name = "Charlie"; // ❌ 这是编译时的契约，不是运行时的保护机制，对象在运行时依然可以变
 
 // ==========================================
 // 示例 7：映射类型 + 条件类型组合
@@ -177,10 +183,10 @@ const readonlyUser: ReadonlyUser = { name: "Bob", age: 30, email: "b@example.com
 // ==========================================
 
 // 提取所有 string 类型的属性名
-type StringKeys<T> = {
-  [K in keyof T]: T[K] extends string ? K : never;
-}[keyof T];
+// 花括号里是映射类型，不是对象
+type StringKeys<T> = { [K in keyof T]: T[K] extends string ? K : never }[keyof T];
 
+// 得到一个全部都是string类型的 新的联合类型
 type UserStringKeys = StringKeys<User>; // "name" | "email"
 
 // 将 null 属性变为非 null
@@ -205,8 +211,8 @@ function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
   return obj[key];
 }
 
-const userObj = { name: "Alice", age: 30 };
-console.log(getProperty(userObj, "name")); // "Alice"
+const userObj = { name: 'Alice', age: 30 };
+console.log(getProperty(userObj, 'name')); // "Alice"
 // getProperty(userObj, "email"); // ❌ 编译错误，email 不在对象中
 
 // ==========================================

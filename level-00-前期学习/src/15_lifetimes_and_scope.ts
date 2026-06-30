@@ -19,10 +19,10 @@
 // ==========================================
 
 function blockScopeDemo(): void {
-  const outer = "outer";
+  const outer = 'outer';
 
   if (true) {
-    const inner = "inner";
+    const inner = 'inner';
     console.log(outer, inner); // 内层可访问外层
   }
 
@@ -38,7 +38,7 @@ blockScopeDemo();
 // ==========================================
 
 function narrowingScope(value: string | number): void {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     console.log(value.toUpperCase()); // 此处 value 是 string
   }
 
@@ -46,44 +46,45 @@ function narrowingScope(value: string | number): void {
   // value.toUpperCase(); // ❌ 编译错误
 
   // 需要重新收窄
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     console.log(value.toLowerCase());
   }
 }
 
-narrowingScope("hello");
+narrowingScope('hello');
 
 // ==========================================
 // 示例 3：类型收窄的失效场景
 // 使用场景：理解何时类型收窄会被编译器「忘记」
 // ==========================================
 
-function narrowingInvalidation(items: string[] | null): void {
+function narrowingPreserved(items: string[] | null): void {
   if (items !== null) {
     console.log(items.length); // 此处 items 是 string[]
 
-    // 调用可能修改 items 的函数后，编译器可能失去 narrowing
-    items.push("new"); // 可以，因为 items 是数组
+    // 直接调用数组方法 .push() 不会使 narrowing 失效，items 仍为 string[]
+    items.push('new'); // 可以，因为 items 是数组
     console.log(items.length);
   }
 }
 
-narrowingInvalidation(["a", "b"]);
+narrowingPreserved(['a', 'b']);
 
 // 函数调用可能导致 narrowing 失效的示例
-let mutableUnion: string | number = "hello";
+let mutableUnion: string | number = 'hello';
 
 function mightChange(): void {
   mutableUnion = 42;
 }
 
-function checkNarrowing(): void {
-  if (typeof mutableUnion === "string") {
+function narrowingInvalidatedAfterCall(): void {
+  if (typeof mutableUnion === 'string') {
     const captured = mutableUnion;
     // 调用外部函数后，编译器无法保证 mutableUnion 仍是 string
     mightChange();
-    // 必须重新使用已捕获的变量，否则 narrowing 可能失效
+    // 此时必须用已捕获的 captured（类型仍为 string），而非 mutableUnion（收窄已失效）
     console.log(captured.toUpperCase());
+    console.log(mutableUnion.toUpperCase()); // ❌ 报错！TS 无法保证 mutableUnion 还是 string
   }
 }
 
@@ -93,8 +94,12 @@ function checkNarrowing(): void {
 // ==========================================
 
 function createCounter(): () => number {
+  // count 本来活不过 createCounter — 函数返回后局部变量就该销毁了。
+  // 但返回的内部箭头函数引用了 count — JavaScript引擎发现"有人还惦记着这个变量"
   let count = 0; // 被闭包捕获
+  // count存在哪里？存在堆内存（Heap）里的词法环境对象（Lexical Environment）中，而不是栈上。
 
+  // 总结：count 存在堆内存的词法环境对象中，因为闭包（返回的函数）持有它的引用，所以不会被 GC 回收，一直活到没有任何引用指向它为止。
   return (): number => {
     count++;
     return count;
@@ -106,19 +111,33 @@ console.log(counter()); // 1
 console.log(counter()); // 2
 console.log(counter()); // 3
 
-// 闭包捕获对象引用
+// 每次调用 createSeparate() 都在堆上新建一个词法环境对象，所以 c1 和 c2 各有一个独立的 count。
+const c1 = createCounter(); // c1 有自己的 [[Environment]]，count 独立
+const c2 = createCounter(); // c2 有另一个 [[Environment]]，count 独立
+
+c1(); // 1
+c1(); // 2
+c2(); // 1  ← c2 用的是自己的 count，从 0 开始
+
+// 与 createCounter 不同，这里闭包捕获的是「对象引用」（数组）
+// closure<items>: 内部函数持有 items 数组的引用，push 操作共享同一个数组实例
 function createAccumulator<T>(initial: T): (value: T) => T[] {
+  // items 数组实例驻留在堆内存的词法环境中，被返回的闭包引用
   const items: T[] = [initial];
 
   return (value: T): T[] => {
-    items.push(value);
-    return items;
+    items.push(value); // 修改被捕获的数组，外部不可见但闭包内共享
+    return items; // 每次返回的都是同一个数组引用
   };
 }
 
-const acc = createAccumulator(10);
-console.log(acc(20)); // [10, 20]
-console.log(acc(30)); // [10, 20, 30]
+const acc1 = createAccumulator(10);
+const acc2 = createAccumulator(100); // 独立实例，有自己的 items
+
+console.log(acc1(20)); // [10, 20]      ← acc1 的 items
+console.log(acc2(200)); // [100, 200]    ← acc2 的 items，完全独立
+console.log(acc1(30)); // [10, 20, 30]   ← acc1 不受 acc2 影响
+console.log(acc2(300)); // [100, 200, 300] ← acc2 也不受 acc1 影响
 
 // ==========================================
 // 示例 5：readonly 与浅层不可变性
@@ -126,20 +145,22 @@ console.log(acc(30)); // [10, 20, 30]
 // ==========================================
 
 const readonlyObj = {
-  name: "Alice",
-  address: { city: "Beijing", zip: "100000" },
-} as const;
+  name: 'Alice',
+  address: { city: 'Beijing', zip: '100000' },
+} as const; // 这种方式所有层级都变成只读，深层也是只读了
+
+// as const 是给字面量用的"既只读又收窄类型，
 
 // readonlyObj.name = "Bob"; // ❌ as const 使所有属性只读
 // readonlyObj.address.city = "Shanghai"; // ❌ 深层也是只读的
 
-// 仅顶层 readonly
+// 仅顶层 readonly，只给属性name和age加readonly，不能改属性重新赋值，属性如果是对象，对象内的可以改
 interface Person {
   readonly name: string;
   readonly age: number;
 }
 
-const person: Person = { name: "Alice", age: 30 };
+const person: Person = { name: 'Alice', age: 30 };
 // person.name = "Bob"; // ❌
 
 // ==========================================
@@ -150,6 +171,8 @@ const person: Person = { name: "Alice", age: 30 };
 type DeepReadonly<T> = {
   readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];
 };
+
+// DeepReadonly<T> 是给已有类型做"递归加 readonly"的类型工具
 
 interface NestedData {
   user: {
@@ -167,8 +190,8 @@ type ImmutableNested = DeepReadonly<NestedData>;
 const immutableData: ImmutableNested = {
   user: {
     profile: {
-      name: "Alice",
-      settings: { theme: "dark" },
+      name: 'Alice',
+      settings: { theme: 'dark' },
     },
   },
 };
@@ -200,7 +223,8 @@ console.log(sharedArray); // [1, 2, 3, 4] —— 两个引用指向同一对象
 // Rust 中这不会这样工作：
 // let shared = vec![1, 2, 3];
 // let alias = shared; // shared 被移动，之后不能再使用
-// TS 没有移动语义，所有赋值都是引用拷贝
+// 与大多数主流语言一样，TS 没有移动语义，所有赋值都是引用拷贝
+// 移动语义是 Rust/C++ 特有的，并非主流语言的默认行为
 
 // ==========================================
 // 示例 9：const 与不可变性的区别
@@ -221,7 +245,7 @@ console.log(mutableObj.value);
 
 function badScope(): void {
   {
-    const blockVar = "inside";
+    const blockVar = 'inside';
   }
   // @ts-expect-error 在块级作用域外访问块内变量
   console.log(blockVar);
