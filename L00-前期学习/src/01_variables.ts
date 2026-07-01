@@ -32,6 +32,7 @@ function oldStyle(): void {
   }
   console.log(x); // 20
 }
+oldStyle();
 
 // ==========================================
 // 示例 2：块级作用域（Block Scoping）
@@ -46,6 +47,7 @@ function blockScopeDemo(): void {
   }
   // blockConst 和 blockLet 在这里不可访问
 }
+blockScopeDemo();
 
 // ==========================================
 // 示例 3：暂时性死区（Temporal Dead Zone, TDZ）
@@ -57,6 +59,7 @@ function temporalDeadZoneDemo(): void {
   const tdZVar = '声明后才能使用';
   console.log(tdZVar);
 }
+temporalDeadZoneDemo();
 
 // ==========================================
 // 示例 4：基本类型注解
@@ -99,11 +102,11 @@ const coordinates: [number, number] = [10, 20];
 
 // 把元组解构赋值给变量
 const [x, y] = coordinates;
-console.log(x, y); // 10, 20
+console.log(x, y); // 10 20
 
 // 解构时可以带默认值
 const [first, second = 0] = [100];
-console.log(first, second); // 100, 0
+console.log(first, second); // 100 0
 
 // ==========================================
 // 示例 8：解构赋值（对象解构）
@@ -115,11 +118,11 @@ const person = { name: 'Alice', age: 30, city: 'Beijing' };
 
 // 对象解构，可以带默认值
 const { name: personName, age, city = 'Unknown' } = person;
-console.log(personName, age, city);
+console.log(personName, age, city); // Alice 30 Beijing
 
 // 函数参数中使用解构，直接把对象的属性都解构出来
 function printUser({ name, age }: { name: string; age: number }): void {
-  console.log(`${name} is ${age} years old`);
+  console.log(`${name} is ${age} years old`); // Tom is 25 years old
 }
 printUser({ name: 'Tom', age: 25 });
 
@@ -148,7 +151,7 @@ const {
 // user: 和 profile: 是解构路径，不是变量声明，只有最终的 id 和 email 才是真正的变量
 // 解构后，你不能访问 user 或 profile 变量（它们根本不存在）
 
-console.log(id, email);
+console.log(id, email); // 1 alice@example.com
 
 // ==========================================
 // 错误示例（故意编写，展示常见错误）
@@ -159,15 +162,15 @@ console.log(id, email);
 
 function hoistingDemo(): void {
   // @ts-expect-error 在声明前访问 let 变量是错误（暂时性死区 TDZ）
-  console.log(hoistedLet);
+  console.log(hoistedLet); // ReferenceError: Cannot access 'hoistedLet' before initialization
   let hoistedLet = 5;
 }
+hoistingDemo();
 
 let strictNumber: number = 42;
-
 // @ts-expect-error 类型 'string' 不能赋值给类型 'number'。但执行起来不报错，TypeScript 类型错误只在编译时检查，运行时 JavaScript 根本不关心类型
 strictNumber = 'not a number';
-console.log(strictNumber);
+console.log(strictNumber); // not a number
 
 // ==========================================
 // 本章小结

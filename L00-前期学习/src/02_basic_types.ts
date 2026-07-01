@@ -23,7 +23,7 @@ const isAwesome: boolean = true;
 
 // 模板字符串也归 string 类型
 const greeting: string = `Hello, ${userName}! You are ${userAge} years old. You are ${isAwesome}`;
-console.log(greeting);
+console.log(greeting); // Hello, TypeScript! You are 10 years old. You are true
 
 // ==========================================
 // 示例 2：null 与 undefined
@@ -45,8 +45,8 @@ nullableString = 'now has value';
 
 // JS 经典 bug：typeof null 返回 "object"（历史遗留问题）。这个 bug 从 1995 年保留至今，无法修复（会破坏大量现有代码）
 // JS 最初版本中，值的类型标签用底层位模式表示，对象类型标签是 000，而 null 的二进制表示全是 0，所以导致typeof检查是误判null为对象类型
-console.log(typeof null); // "object" ⚠️ 不是 "null"
-console.log(typeof undefined); // "undefined" ✓
+console.log(typeof null); // object ⚠️ 不是 "null"
+console.log(typeof undefined); // undefined
 
 // 在TS中，null 是一个独立的类型，不是 object
 // 在JS中，typeof null 错误地返回 "object"，但 null 本身不是对象。
@@ -62,9 +62,10 @@ console.log(typeof undefined); // "undefined" ✓
 // ==========================================
 
 function logMessage(msg: string): void {
-  console.log(msg);
+  console.log(msg); // Hare are you
   // 没有 return 语句，或只写 return;
 }
+logMessage('Hare are you');
 
 const useless: void = undefined; // void 只能赋值为 undefined 或 null（非 strictNullChecks 下）
 
@@ -90,7 +91,8 @@ uncertain = 'maybe a string';
 // uncertain.toFixed(); // ❌ 编译错误
 
 if (typeof uncertain === 'string') {
-  console.log(uncertain.toUpperCase()); // 在类型保护内可以安全使用
+  // 在类型保护内可以安全使用
+  console.log(uncertain.toUpperCase()); // MAYBE A STRING
 }
 
 // ==========================================
@@ -99,8 +101,9 @@ if (typeof uncertain === 'string') {
 // ==========================================
 
 function throwError(message: string): never {
-  throw new Error(message);
+  throw new Error(message); // Error: haha
 }
+// throwError('haha');
 
 function infiniteLoop(): never {
   while (true) {
@@ -109,7 +112,7 @@ function infiniteLoop(): never {
 }
 
 // never 在联合类型中会自动消失
-// type T = string | never; // 等价于 string
+type T = string | never; // 等价于 string
 
 // ==========================================
 // 示例 7：bigint —— 大整数
@@ -118,8 +121,8 @@ function infiniteLoop(): never {
 
 const bigNumber: bigint = 9007199254740991n; // 整数末尾加 n
 const anotherBig: bigint = BigInt(123456789);
-console.log(bigNumber + anotherBig);
-console.log(`bigNumber + anotherBig = ${bigNumber + anotherBig}`);
+console.log(bigNumber + anotherBig); // 9007199378197780n
+console.log(`bigNumber + anotherBig = ${bigNumber + anotherBig}`); // bigNumber + anotherBig = 9007199378197780
 
 // ==========================================
 // 示例 8：symbol —— 唯一标识符
@@ -153,9 +156,13 @@ console.log(objWithSymbol[secretKey]); // hidden value
 let direction: 'north' | 'south' | 'east' | 'west';
 direction = 'north';
 // direction = "up"; // ❌ 不在允许的范围内
+console.log(typeof direction); // string
 
 type HttpStatus = 200 | 404 | 500;
 const statusCode: HttpStatus = 200;
+console.log(typeof statusCode); // number
+
+// typeof direction 是 JavaScript 的运行时运算符，它只能返回 "string"、"number"、"boolean" 等运行时类型，不会返回 TypeScript 的字面量联合类型。
 
 // ==========================================
 // 示例 10：as const —— 将对象/数组转为只读字面量类型
@@ -174,25 +181,31 @@ const config = {
 //   readonly port: 3000;
 //   readonly debug: true;
 // }
+console.log(config); // { host: 'localhost', port: 3000, debug: true }
+console.log(typeof config); // object
 
 // config.port = 8080; // ❌ 只读属性不能修改
 
 const tupleConst = [1, 2, 3] as const;
 // tupleConst 的类型为 readonly [1, 2, 3]，固定长度且不可变
 
+console.log(tupleConst); // [ 1, 2, 3 ]
+console.log(typeof tupleConst); // object
+
 // ==========================================
 // 错误示例（故意编写，展示常见错误）
 // ==========================================
 
+// 此处演示 unknown 类型的变量不能直接赋值给具体类型，与 any 不同，any 可以
 let anotherUnknown: unknown = 'test';
-// @ts-expect-error any 赋给具体类型是允许的，但反向需小心；此处演示 unknown 类型的变量不能直接赋值给具体类型
-let unknownToString: string = anotherUnknown;
+// @ts-expect-error unknown 类型不能直接赋值给具体类型，必须先做类型收窄。
+let unknownToString: string = anotherUnknown; // 编译器报错
 
 // @ts-expect-error 非 never 类型不能赋值给 never
-let neverValue: never = 'impossible';
+let neverValue: never = 'impossible'; // 编译器报错
 
 // @ts-expect-error 在 strictNullChecks 下，null 不能赋值给非 null 类型
-let strictNum: number = null;
+let strictNum: number = null; // 编译器报错
 
 // ==========================================
 // 本章小结
