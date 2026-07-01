@@ -43,6 +43,19 @@ let strictString: string = 'hello';
 let nullableString: string | null = null;
 nullableString = 'now has value';
 
+// JS 经典 bug：typeof null 返回 "object"（历史遗留问题）。这个 bug 从 1995 年保留至今，无法修复（会破坏大量现有代码）
+// JS 最初版本中，值的类型标签用底层位模式表示，对象类型标签是 000，而 null 的二进制表示全是 0，所以导致typeof检查是误判null为对象类型
+console.log(typeof null); // "object" ⚠️ 不是 "null"
+console.log(typeof undefined); // "undefined" ✓
+
+// 在TS中，null 是一个独立的类型，不是 object
+// 在JS中，typeof null 错误地返回 "object"，但 null 本身不是对象。
+
+// null 是原型链的终点，但它自己不在原型链上
+// 所有对象的原型链最终都指向 null
+// null 表示"没有对象"，它自己没有原型、没有属性、没有方法
+// Object.prototype 的原型是 null，这是原型链的尽头
+
 // ==========================================
 // 示例 3：void 类型
 // 使用场景：函数没有返回值时的返回类型
@@ -91,7 +104,7 @@ function throwError(message: string): never {
 
 function infiniteLoop(): never {
   while (true) {
-    // 永不离出
+    // 永不退出
   }
 }
 
@@ -103,7 +116,7 @@ function infiniteLoop(): never {
 // 使用场景：处理超过 Number.MAX_SAFE_INTEGER 的整数
 // ==========================================
 
-const bigNumber: bigint = 9007199254740991n;
+const bigNumber: bigint = 9007199254740991n; // 整数末尾加 n
 const anotherBig: bigint = BigInt(123456789);
 console.log(bigNumber + anotherBig);
 console.log(`bigNumber + anotherBig = ${bigNumber + anotherBig}`);
@@ -116,23 +129,21 @@ console.log(`bigNumber + anotherBig = ${bigNumber + anotherBig}`);
 const sym1: symbol = Symbol('description');
 const sym2: symbol = Symbol('description');
 
-console.log(`sym1 === sym2 = ${sym1 === sym2}`); // false，每个 Symbol 都是唯一的
-
-console.log(`typeof sym1 = ${typeof sym1}`);
-
-const sym3 = sym1;
-console.log(`typeof sym3 = ${typeof sym3}`);
-
+console.log(typeof sym1); // symbol
 console.log(sym1 === sym2); // false，每个 Symbol 都是唯一的
+
+const sym3 = sym1; // sym3 引用的是同一个 Symbol 实例
+console.log(typeof sym3); // symbol
+console.log(sym1 === sym3); // true，引用相同的 Symbol 实例
 
 const secretKey = Symbol('secret');
 const objWithSymbol = {
   [secretKey]: 'hidden value', // 如果不带方括号，键就变成字符串了。带了方括号才表示是Symbol实例对象
   normalKey: 'visible value',
 };
-console.log(`objWithSymbol = ${objWithSymbol}`);
-console.log(objWithSymbol.normalKey);
-console.log(objWithSymbol[secretKey]);
+console.log(objWithSymbol); // { normalKey: 'visible value', [Symbol(secret)]: 'hidden value' }
+console.log(objWithSymbol.normalKey); // visible value
+console.log(objWithSymbol[secretKey]); // hidden value
 
 // ==========================================
 // 示例 9：字面量联合类型（Literal Types）
@@ -173,8 +184,9 @@ const tupleConst = [1, 2, 3] as const;
 // 错误示例（故意编写，展示常见错误）
 // ==========================================
 
+let anotherUnknown: unknown = 'test';
 // @ts-expect-error any 赋给具体类型是允许的，但反向需小心；此处演示 unknown 类型的变量不能直接赋值给具体类型
-let unknownToString: string = uncertain;
+let unknownToString: string = anotherUnknown;
 
 // @ts-expect-error 非 never 类型不能赋值给 never
 let neverValue: never = 'impossible';
