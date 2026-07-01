@@ -1,0 +1,16 @@
+{
+  "name": "L04-type-guards",
+  "version": "1.0.0",
+  "description": "Level 04: 类型守卫与类型收窄",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "tsc && node dist/main.js",
+    "dev": "tsx src/main.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.8.3"
+  }
+}

@@ -8,7 +8,7 @@ importers:
 
   .: {}
 
-  level-00-前期学习:
+  L00-前期学习:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -20,7 +20,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-01-编译模型与严格模式配置:
+  L01-编译模型与严格模式配置:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -32,7 +32,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-02-结构类型系统与名义类型思维:
+  L02-结构类型系统与名义类型思维:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -44,7 +44,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-03-类型层级与高级类型操作:
+  L03-类型层级与高级类型操作:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -56,7 +56,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-04-类型守卫与类型收窄:
+  L04-类型守卫与类型收窄:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -68,7 +68,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-05-泛型约束与条件类型:
+  L05-泛型约束与条件类型:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -80,7 +80,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-06-映射类型与模板字面量类型:
+  L06-映射类型与模板字面量类型:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -92,7 +92,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-07-函数类型协变逆变与重载:
+  L07-函数类型协变逆变与重载:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -104,7 +104,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-08-类装饰器与元数据:
+  L08-类装饰器与元数据:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -116,7 +116,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-09-模块系统与类型声明:
+  L09-模块系统与类型声明:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -128,7 +128,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-10-类型体操实战与编译期验证:
+  L10-类型体操实战与编译期验证:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0
@@ -140,7 +140,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  level-11-毕业设计-类型安全CLI配置解析器:
+  L11-毕业设计-类型安全CLI配置解析器:
     devDependencies:
       '@types/node':
         specifier: ^24.0.0

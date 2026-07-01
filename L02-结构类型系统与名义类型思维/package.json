@@ -1,0 +1,16 @@
+{
+  "name": "L02-structural-typing",
+  "version": "1.0.0",
+  "description": "Level 02: 结构类型系统与名义类型思维",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "tsc && node dist/main.js",
+    "dev": "tsx src/main.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.8.3"
+  }
+}

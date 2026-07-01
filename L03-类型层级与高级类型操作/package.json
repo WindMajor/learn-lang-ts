@@ -1,0 +1,16 @@
+{
+  "name": "L03-type-hierarchy",
+  "version": "1.0.0",
+  "description": "Level 03: 类型层级与高级类型操作",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "tsc && node dist/main.js",
+    "dev": "tsx src/main.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.8.3"
+  }
+}
