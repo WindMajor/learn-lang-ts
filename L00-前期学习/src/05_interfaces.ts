@@ -28,7 +28,7 @@ const alice: Person = {
   age: 30,
 };
 
-console.log(alice);
+console.log(alice); // { name: 'Alice', age: 30 }
 
 // ==========================================
 // 示例 2：可选属性（Optional Properties）
@@ -54,7 +54,7 @@ const laptop: Product = {
   description: '高性能笔记本电脑',
 };
 
-console.log(book, laptop);
+console.log(book, laptop); // { id: 1, name: 'TypeScript 进阶' } { id: 2, name: 'MacBook Pro', price: 14999, description: '高性能笔记本电脑' }
 
 // ==========================================
 // 示例 3：只读属性（Readonly Properties）
@@ -80,9 +80,9 @@ mutable.coords.push(3); // 可以，因为数组本身是可变的
 // 只读的四种组合（从松到严）：
 interface Demo {
   a: number[]; // 属性可变，数组可变
-  readonly b: number[]; // 属性只读，数组可变
-  c: readonly number[]; // 属性可变，数组不可变
-  readonly d: readonly number[]; // 属性只读，数组只读 ✅ 等价 as const
+  readonly b: number[]; // 属性只读，数组内部可变
+  c: readonly number[]; // 属性可变，数组内部不可变
+  readonly d: readonly number[]; // 属性只读，数组只读 ✅ 等价 as const （在02_basic_types.ts里学过）
 }
 
 // ==========================================
@@ -92,7 +92,7 @@ interface Demo {
 // ==========================================
 
 interface StringDictionary {
-  [key: string]: string;
+  [key: string]: string; // key可以改别的，但是建议是key
 }
 
 const translations: StringDictionary = {
@@ -101,12 +101,14 @@ const translations: StringDictionary = {
   goodbye: '再见',
 };
 
-console.log(translations.hello);
+console.log(translations.hello); // 你好
 
 // 混合索引签名与已知属性
 interface MixedDict {
   name: string; // 已知属性
   [key: string]: string | number; // 索引签名需兼容已知属性
+  // 键key的类型可以是string number symbol 模板字符串
+  // 值的类型可以声明任何类型，当前案例被声明成 string | number
 }
 
 const mixed: MixedDict = {
@@ -141,7 +143,7 @@ const sparrow: Bird = {
   },
 };
 
-sparrow.fly();
+sparrow.fly(); // Flying high
 
 // 多继承（一个接口可继承多个接口）
 interface CanSwim {
@@ -188,7 +190,7 @@ class ConsoleLogger implements Logger {
 }
 
 const logger = new ConsoleLogger();
-logger.log('System started');
+logger.log('System started'); // [LOG] System started
 
 // ==========================================
 // 示例 7：接口的声明合并（Declaration Merging）
@@ -211,10 +213,10 @@ const mockWindow: Window = {
   anotherProperty: 42,
 };
 
-console.log(mockWindow);
+console.log(mockWindow); // { customProperty: 'hello', anotherProperty: 42 }
 
 // ==========================================
-// 示例 8：函数类型接口
+// 示例 8：函数类型接口（调用签名），接口就是函数
 // 使用场景：用接口描述函数签名，比 type 别名更具扩展性
 // ==========================================
 
@@ -231,26 +233,23 @@ console.log(mySearch('hello world', 'world')); // true
 // 这是一个调用签名（Call Signature）：接口描述的不是"对象有 xx 方法"，
 // 而是"接口本身可以当函数调用"。没有方法名，直接 () 就用。
 // 对比 type F = (a: number) => string 也可以，但 interface 可以 extends / 声明合并。
-// 类比 Python 的 Callable[[str, str], bool]，Java 的 @FunctionalInterface。
 
-// 对比：普通方法 vs 调用签名
+// 对比：普通方法接口 vs 调用签名
+// 普通方法接口，接口是对象，包含方法
 interface NormalSearcher {
-  find(source: string, sub: string): boolean;  // 普通方法 → 通过 .find() 调用
+  find(source: string, sub: string): boolean; // 普通方法 → 通过 .find() 调用
 }
 const s1: NormalSearcher = { find: (a, b) => a.includes(b) };
-s1.find('hello', 'lo');  // ✅ 有方法名
+s1.find('hello', 'lo'); // ✅ 有方法名
 
 // 调用签名的优势：可以声明合并（给函数类型加属性）
 interface RichFunc {
-  (input: string): string;  // 可调用
-  description: string;       // 同时有属性
+  (input: string): string; // 可调用
+  description: string; // 同时有属性
 }
-const r: RichFunc = Object.assign(
-  (input: string) => input.toUpperCase(),
-  { description: '转大写' },
-);
-console.log(r('hello'));       // 'HELLO'
-console.log(r.description);    // '转大写'
+const r: RichFunc = Object.assign((input: string) => input.toUpperCase(), { description: '转大写' });
+console.log(r('hello')); // 'HELLO'
+console.log(r.description); // '转大写'
 
 // ==========================================
 // 示例 9：结构类型系统（Structural Typing）—— TS 的"鸭子类型"
@@ -280,6 +279,7 @@ interface Point2 {
 
 // ✅ 结构类型：不需要 implements，形状匹配就兼容
 const p1: Point2 = { x: 0, y: 0 }; // 对象字面量，有 x, y → 通过
+
 class MapPoint {
   x: number = 0;
   y: number = 0;
@@ -303,6 +303,13 @@ const extraProps: Person = {
   age: 25,
   // @ts-expect-error 对象字面量中不能有多余的属性（除非接口有索引签名）
   hobby: 'coding',
+
+  // TypeScript 的一个重要规则：对象字面量的严格检查 vs 变量赋值的宽松检查
+  // 1.直接使用对象字面量（严格检查），错误，不能有多余的属性
+
+  // 2.先赋值给变量，再使用（宽松检查）
+  // const dog = { name: '旺财', bark: '汪' };  // 先创建变量
+  // const animal1: Named = dog;  // ✅ 通过！只检查是否有 name
 };
 
 // @ts-expect-error 只读属性不能重新赋值
