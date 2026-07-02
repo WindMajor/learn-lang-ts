@@ -11,5 +11,7 @@ packages:
   - "L09-*"
   - "L10-*"
   - "L11-*"
+allowBuilds:
+  esbuild: true
 onlyBuiltDependencies:
   - esbuild
