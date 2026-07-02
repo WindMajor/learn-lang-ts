@@ -37,12 +37,12 @@ console.log(formatValue(3.14159)); // 3.14
 
 const age = 20;
 const status = age >= 18 ? 'adult' : 'minor';
-console.log(status);
+console.log(status); // adult
 
 // 嵌套三元运算符（谨慎使用，保持可读性）
 const score = 85;
 const grade = score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 60 ? 'C' : 'D';
-console.log(grade);
+console.log(grade); // B
 
 // ==========================================
 // 示例 3：switch 语句与穷尽检查
@@ -77,6 +77,10 @@ function getDirectionVector(direction: Direction): { x: number; y: number } {
 const items = ['a', 'b', 'c', 'd'];
 for (let i = 0; i < items.length; i++) {
   console.log(`Index ${i}: ${items[i]}`);
+  // Index 0: a
+  // Index 1: b
+  // Index 2: c
+  // Index 3: d
 }
 
 // ==========================================
@@ -103,6 +107,9 @@ for (const key in obj) {
   // 过滤掉原型链上的属性，只保留对象自己的属性
   if (Object.prototype.hasOwnProperty.call(obj, key)) {
     console.log(`${key}: ${obj[key as keyof typeof obj]}`);
+    // a: 1
+    // b: 2
+    // c: 3
   }
 }
 
@@ -113,13 +120,13 @@ for (const key in obj) {
 
 let counter = 0;
 while (counter < 3) {
-  console.log(`while: ${counter}`);
+  console.log(`while: ${counter}`); // while: 0 1 2
   counter++;
 }
 
 let doCounter = 0;
 do {
-  console.log(`do-while: ${doCounter}`);
+  console.log(`do-while: ${doCounter}`); // do-while: 0 1 2
   doCounter++;
 } while (doCounter < 3);
 
@@ -141,6 +148,10 @@ outerLoop: for (let i = 0; i < 3; i++) {
       break outerLoop;
     }
     console.log(`i=${i}, j=${j}`);
+    // i=0, j=0
+    // i=0, j=1
+    // i=0, j=2
+    // i=1, j=0
   }
 }
 
@@ -158,9 +169,9 @@ function divideSafe(a: number, b: number): number {
 
 try {
   console.log(divideSafe(10, 2)); // 5
-  divideSafe(10, 0); // 抛出异常
+  // divideSafe(10, 0); // 抛出异常
 } catch (e) {
-  console.error('捕获错误:', e);
+  console.error('捕获错误:', e); // 捕获错误: Error: 除数不能为零
 }
 
 // ==========================================
@@ -181,9 +192,9 @@ function processInput(input: string | number | string[]): string {
   return `Number: ${input.toFixed(2)}`;
 }
 
-console.log(processInput('hello'));
-console.log(processInput(42));
-console.log(processInput(['a', 'b']));
+console.log(processInput('hello')); // String: hello
+console.log(processInput(42)); // Number: 42.00
+console.log(processInput(['a', 'b'])); // Array with 2 items
 
 // ==========================================
 // 错误示例（故意编写，展示常见错误）
@@ -196,6 +207,8 @@ function wrongNarrow(value: string | number): void {
   // @ts-expect-error 在类型收窄后访问已排除类型的方法会报错：value 可能是 number
   console.log(value.toUpperCase());
 }
+wrongNarrow('abc'); // ABC
+wrongNarrow(3); // 报错TypeError: value.toUpperCase is not a function
 
 // @ts-expect-error for-of 不能用于普通对象（非可迭代对象），只能使用 for-in
 for (const x of obj) {
@@ -208,7 +221,7 @@ function fallThroughBug(statusCode: number): string {
   switch (statusCode) {
     case 200:
       result = 'OK';
-      // ❌ 忘记 return 或 break → 穿透到下一个 case！
+    // ❌ 忘记 return 或 break → 穿透到下一个 case！
     case 404:
       result = 'Not Found';
       break; // 这里的 break 实际上也会被穿透触发，然后停止
