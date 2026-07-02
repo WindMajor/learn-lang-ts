@@ -8,7 +8,7 @@
  *
  * 与 Python/Java/Rust 的对比提示：
  * - Python 函数无需声明类型（3.5+ 可用类型提示），TS 要求编译期检查
- * - Java 支持方法重载（基于参数类型/数量），TS 的函数重载更像声明多个人口，最终只有一个实现
+ * - Java 支持方法重载（基于参数类型/数量），TS 的函数重载更像声明多个入口，最终只有一个实现
  * - Rust 的函数参数必须带类型注解；TS 的参数可推断但建议显式注解
  * - Rust 没有 this；TS/Java 的 this 指向调用上下文
  */
@@ -21,6 +21,7 @@
 function add(a: number, b: number): number {
   return a + b;
 }
+console.log(add(1, 2)); // 3
 
 // ==========================================
 // 示例 2：函数表达式（Function Expression）
@@ -30,6 +31,7 @@ function add(a: number, b: number): number {
 const multiply = function (a: number, b: number): number {
   return a * b;
 };
+console.log(multiply(3, 4)); // 12
 
 // ==========================================
 // 示例 3：箭头函数（Arrow Function）
@@ -37,11 +39,13 @@ const multiply = function (a: number, b: number): number {
 // ==========================================
 
 const divide = (a: number, b: number): number => a / b;
+console.log(divide(7, 2)); // 3.5
 
 // 多行箭头函数需显式 return
 const power = (base: number, exponent: number): number => {
   return base ** exponent;
 };
+console.log(power(2, 3)); // 8
 
 // ==========================================
 // 示例 4：可选参数（Optional Parameters）
@@ -72,6 +76,7 @@ console.log(createURL(undefined, 'example.com', '/api')); // https://example.com
 // 使用场景：接受任意数量的同类型参数
 // ==========================================
 function sumAll(...numbers: number[]): number {
+  console.log(typeof numbers); // object，实际是数组
   return numbers.reduce((total, n) => total + n, 0);
 }
 
@@ -106,10 +111,11 @@ function processInput(input: string | number | boolean): string | number | boole
 }
 
 const result1: string = processInput('hello');
+console.log(result1); // HELLO
 const result2: number = processInput(42);
+console.log(result2); // 84
 
-// 没有重载时，TS 只知道 processInput 返回 string | number | boolean，
-// 必须手动断言或用更宽的类型接收。重载没有任何运行时开销，
+// 没有重载时，TS 只知道 processInput 返回 string | number | boolean，必须手动断言或用更宽的类型接收
 // 实现体不变 —— 纯编译期约束，让调用方类型更精确。
 
 // 重载的另一个用法：约束参数个数，锁定合法的调用模式
@@ -125,9 +131,9 @@ function padding(top: number, right?: number, bottom?: number, left?: number): v
 }
 
 // ✅ 只有 1 / 2 / 4 个参数是合法的
-padding(10); // 四边相同
-padding(10, 20); // 上下、左右
-padding(10, 20, 30, 40); // 分别指定
+padding(10); // 四边相同 padding: 10 10 10 10
+padding(10, 20); // 上下、左右 padding: 10 20 10 20
+padding(10, 20, 30, 40); // 分别指定 padding: 10 20 30 40
 // ❌ 以下被重载签名拦截，编译报错
 // padding();               // 不传参数 —— 无匹配
 // padding(10, 20, 30);     // 3 个参数 —— 逻辑上不支持
@@ -137,9 +143,28 @@ padding(10, 20, 30, 40); // 分别指定
 // 使用场景：明确函数中 this 的预期类型，防止错误的上下文调用
 // ==========================================
 
+/** 不用this，容易导致错误*/
+interface User5 {
+  name: string;
+  greet(): string;
+}
+
+const user5: User5 = {
+  name: 'Alice',
+  greet() {
+    return `Hello, I'm ${this.name}`;
+  },
+};
+user5.greet(); // ✅ 正常：this 指向 user
+
+const greetFunc = user5.greet;
+greetFunc(); // ❌ TypeScript 编译期不会报错，但运行时错误：this 是 undefined，无法读取 this.name
+
+/** 使用this */
 interface User {
   name: string;
   greet(this: User): string; // this 不是一个真实的参数，只是TS的专用类型标记
+  // 在接口中写 greet(this: User): string，告诉 TypeScript：这个方法只能在 this 是 User 类型的上下文中调用
 }
 
 const user: User = {
@@ -149,7 +174,11 @@ const user: User = {
   },
 };
 
-console.log(user.greet());
+console.log(user.greet()); // ✅ 正常：this 指向 user
+
+const greetFunc2 = user.greet;
+// greetFunc2(); // ❌ TypeScript 编译期直接报错
+// 这正是 this 类型注解的价值：在编译期就发现 this 丢失的问题，而不是等到运行时才报错。
 
 // ==========================================
 // 示例 9：回调函数类型
@@ -162,12 +191,12 @@ const handleClick: ClickHandler = (event) => {
   console.log(`Clicked at (${event.x}, ${event.y})`);
 };
 
-handleClick({ x: 100, y: 200 });
+handleClick({ x: 100, y: 200 }); // Clicked at (100, 200)
 
 // 数组的回调方法
 const numbers = [1, 2, 3, 4, 5];
 const evens = numbers.filter((n: number): boolean => n % 2 === 0);
-console.log(evens);
+console.log(evens); // [ 2, 4 ]
 
 // ==========================================
 // 错误示例（故意编写，展示常见错误）
